@@ -1,15 +1,21 @@
 #include <iostream>
-#include "autoerr.h"
-
-using namespace std;
+#include "autoerr.hpp"
 
 int main(int argc, char *argv[])
 {
-    edouble a(10, 4);
-    edouble b = {5, 1};
+    // Definition: (value, error)
+    err::edouble a(9.9, 4.2);
+    err::edouble b = {5, 2.3};
 
-    edouble c = a + 3 * b;
+    // Some random example, uncertainty is computed automatically!
+    err::edouble c = a * 0.5 + (3 + b) * err::sqrt(b).sin() / a;
 
-    cout << c << endl;
+    // Value and uncertainty can be accessed like this
+    double mean = c.value;
+    double std_dev = c.error;
+
+    // Output works too, no input though
+    std::cout << c << std::endl;
+
     return 0;
 }

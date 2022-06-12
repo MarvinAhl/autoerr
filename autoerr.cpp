@@ -1,10 +1,8 @@
-#include "autoerr.h"
+#include "autoerr.hpp"
 
-// Utility
-inline double sqr(double a)
-{
-    return a * a;
-}
+namespace err {
+
+inline double sqr(double a) { return a * a; }  // Square utility
 
 edouble::edouble()
 {
@@ -24,7 +22,7 @@ edouble::edouble(double value, double error)
     this->error = error;
 }
 
-edouble edouble::pow(edouble a)
+edouble edouble::pow(const edouble& a)
 {
     double value = std::pow(this->value, a.value);
     double error = std::abs(value) * std::sqrt(sqr(a.value * this->error / this->value) + sqr(std::log(this->value) * a.error));
@@ -71,71 +69,53 @@ edouble edouble::tan()
     return this->sin() / this->cos();
 }
 
-edouble operator+(edouble a, edouble b)
+edouble operator+(const edouble& a, const edouble& b)
 {
     double value = a.value + b.value;
     double error = std::sqrt(sqr(a.error) + sqr(b.error));
     return edouble(value, error);
 }
 
-edouble operator-(edouble a, edouble b)
+edouble operator-(const edouble& a, const edouble& b)
 {
     double value = a.value - b.value;
     double error = std::sqrt(sqr(a.error) + sqr(b.error));
     return edouble(value, error);
 }
 
-edouble operator*(edouble a, edouble b)
+edouble operator*(const edouble& a, const edouble& b)
 {
     double value = a.value * b.value;
     double error = std::sqrt(sqr(b.value * a.error) + sqr(a.value * b.error));
     return edouble(value, error);
 }
 
-edouble operator/(edouble a, edouble b)
+edouble operator/(const edouble& a, const edouble& b)
 {
     double value = a.value / b.value;
     double error = std::sqrt(sqr(a.error / b.value) + sqr(a.value * b.error / sqr(b.value)));
     return edouble(value, error);
 }
 
-inline edouble pow(edouble a, edouble b)
+std::ostream& operator<<(std::ostream& os, const edouble& a)
 {
-    return a.pow(b);
-}
-
-inline edouble sqrt(edouble a)
-{
-    return a.sqrt();
-}
-
-inline edouble exp(edouble a)
-{
-    return a.exp();
-}
-
-inline edouble log(edouble a)
-{
-    return a.exp();
-}
-
-inline edouble sin(edouble a)
-{
-    return a.sin();
-}
-
-inline edouble cos(edouble a)
-{
-    return a.cos();
-}
-
-inline edouble tan(edouble a)
-{
-    return a.tan();
-}
-
-std::ostream& operator<<(std::ostream& os, edouble a)
-{
-    os << a.value << "+-" << a.error;
+    os << a.value << " +- " << a.error;
     return os;
 }
+
+double edouble::abs_to_rel()
+{
+    return this->error / this->value;
+}
+
+double edouble::abs_to_rel(const double& abs_error)
+{
+    return abs_error / this->value;
+}
+
+double edouble::rel_to_abs(const double& rel_error)
+{
+    return rel_error * this->value;
+}
+
+}  // End namespace err
